@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Recipe Sharing Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #fff;
+        }
+
+        .navbar {
+            background-color: purple !important;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .search-input {
+            width: 50%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-right: 10px;
+        }
+
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .rating {
+            color: gold;
+            cursor: pointer;
+        }
+
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 40px auto;
+            max-width: 1200px;
+        }
+
+        .recipe-item {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .recipe-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .recipe-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .recipe-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .popup-left {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .popup-right {
+            width: 100%;
+            padding: 10px;
+            overflow-y: auto;
+            /* Add scrollbar if content is too long */
+        }
+
+        .popup-left img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .popup-bottom {
+            margin-top: auto;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popup-bottom button {
+            margin-left: 10px;
+        }
+
+        .comment-form {
+            display: none;
+            padding: 10px;
+            background-color: #2e2e2e;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 10px;
+        }
+
+        .comment-form button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="/RECIPE.png" alt="Logo"> RECIPE - At Your Finger Tips
+            </a>
+        </div>
+    </nav>
+
+    <!-- Search Box and Upload Button -->
+    <div class="search-container">
+        <input id="search" class="search-input" type="search" placeholder="Search Recipes" aria-label="Search">
+        <button class="btn btn-primary" onclick="toggleUploadForm()">Upload Your Recipe</button>
+    </div>
+
+    <!-- Recipe Grid -->
+    <div class="recipe-grid" id="recipe-grid">
+        <div class="recipe-item"
+            onclick="openRecipePopup('Chicken Dum Biryani', 'John Doe', '★★★★☆', '/biryani.jpg', 'biryani')">
+            <img src="/biryani.jpg" alt="Chicken Dum Biryani">
+            <div class="recipe-info">
+                <h5>Chicken Dum Biryani</h5>
+                <p>Chef: John Doe</p>
+                <p>Rating: ★★★★☆</p>
+            </div>
+        </div>
+        <div class="recipe-item"
+            onclick="openRecipePopup('Butter Chicken', 'Jane Smith', '★★★★★', '/Authentic Butter Chicken (Murgh Makhani) - Masala and Chai.jpg', 'butterChicken')">
+            <img src="/Authentic Butter Chicken (Murgh Makhani) - Masala and Chai.jpg" alt="Butter Chicken">
+            <div class="recipe-info">
+                <h5>Butter Chicken</h5>
+                <p>Chef: Jane Smith</p>
+                <p>Rating: ★★★★★</p>
+            </div>
+        </div>
+        <div class="recipe-item"
+            onclick="openRecipePopup('Egg Fried Rice', 'Mike Johnson', '★★★☆☆', '/Simple Egg Fried Rice.jpg', 'eggFriedRice')">
+            <img src="/Simple Egg Fried Rice.jpg" alt="Egg Fried Rice">
+            <div class="recipe-info">
+                <h5>Egg Fried Rice</h5>
+                <p>Chef: Mike Johnson</p>
+                <p>Rating: ★★★☆☆</p>
+            </div>
+        </div>
+        <div class="recipe-item"
+            onclick="openRecipePopup('A5 Wagyu Steak', 'Sarah Lee', '★★★★★', '/wagyu.jpg', 'wagyuSteak')">
+            <img src="/wagyu.jpg" alt="A5 Wagyu Steak">
+            <div class="recipe-info">
+                <h5>A5 Wagyu Steak</h5>
+                <p>Chef: Sarah Lee</p>
+                <p>Rating: ★★★★★</p>
+            </div>
+        </div>
+        <div class="recipe-item"
+            onclick="openRecipePopup('Beef Wellington', 'Gordon Ramsay', '★★★★★', '/beef wellington.jpg', 'beefWellington')">
+            <img src="/beef wellington.jpg" alt="Beef Wellington">
+            <div class="recipe-info">
+                <h5>Beef Wellington</h5>
+                <p>Chef: Gordon Ramsay</p>
+                <p>Rating: ★★★★★</p>
+            </div>
+        </div>
+        <div class="recipe-item"
+            onclick="openRecipePopup('New York Style Pizza', 'Tony Soprano', '★★★★☆', '/pizza.jpg', 'newYorkPizza')">
+            <img src="/pizza.jpg" alt="New York Style Pizza">
+            <div class="recipe-info">
+                <h5>New York Style Pizza</h5>
+                <p>Chef: Tony Soprano</p>
+                <p>Rating: ★★★★☆</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Pop-up -->
+    <div id="recipePopup" class="popup">
+        <div class="popup-content">
+            <span class="close-button" onclick="closeRecipePopup()">&times;</span>
+            <div class="popup-left">
+                <img id="popupImage" src="" alt="Recipe Image">
+                <h5 id="popupChef">Chef: </h5>
+                <p id="popupRating">Rating: </p>
+            </div>
+            <div class="popup-right">
+                <h3 id="popupTitle"></h3>
+                <p id="popupDescription"></p>
+                <h4>Ingredients:</h4>
+                <ul id="popupIngredients"></ul>
+                <h4>Instructions:</h4>
+                <ol id="popupInstructions"></ol>
+                <div class="comment-form" id="commentForm">
+                    <textarea id="commentInput" placeholder="Write your comment here..."></textarea>
+                    <button onclick="postComment()">Post Comment</button>
+                </div>
+                <div id="postedComments"></div>
+            </div>
+            <div class="popup-bottom">
+                <button class="btn btn-secondary" onclick="toggleCommentForm()">Comment</button>
+                <button class="btn btn-primary">Share</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleUploadForm() {
+            const formSection = document.getElementById('upload-section');
+            formSection.style.display = formSection.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Recipe data
+        const recipes = {
+            biryani: {
+                title: 'Chicken Dum Biryani',
+                description: 'A flavorful South Indian dish made with aromatic spices, basmati rice, and marinated chicken.',
+                ingredients: [
+                    '1 cup basmati rice',
+                    '1 lb boneless chicken',
+                    '2 medium onions',
+                    '2 cloves garlic',
+                    '1 tsp cumin seeds',
+                    '1 tsp coriander powder',
+                    '1 tsp turmeric powder',
+                    'Salt to taste',
+                    '2 tbsp ghee'
+                ],
+                instructions: [
+                    'Marinate chicken in spices and yogurt for 30 minutes.',
+                    'Cook basmati rice until it\'s 70% done.',
+                    'Layer rice and marinated chicken in a pot.',
+                    'Cover and cook on low heat for 20 minutes.'
+                ]
+            },
+            butterChicken: {
+                title: 'Butter Chicken',
+                description: 'A popular North Indian dish made by marinating chicken in spices and yogurt, then grilling and simmering in a rich tomato sauce.',
+                ingredients: [
+                    '1 lb boneless chicken',
+                    '1 cup yogurt',
+                    '2 tbsp lemon juice',
+                    '2 tbsp ghee',
+                    '2 medium onions',
+                    '2 cloves garlic',
+                    '1 tsp cumin seeds',
+                    '1 tsp coriander powder',
+                    '1 tsp garam masala',
+                    'Salt to taste',
+                    '2 cups tomato puree'
+                ],
+                instructions: [
+                    'Marinate chicken in spices and yogurt for 30 minutes.',
+                    'Grill the marinated chicken until it\'s cooked.',
+                    'Make a sauce by sautéing onions, garlic, and spices, then add tomato puree.',
+                    'Simmer the grilled chicken in the sauce until it\'s well coated.'
+                ]
+            },
+            eggFriedRice: {
+                title: 'Egg Fried Rice',
+                description: 'A simple Chinese dish made by stir-frying cooked rice with vegetables and eggs.',
+                ingredients: [
+                    '2 cups cooked rice',
+                    '2 eggs',
+                    '1 medium onion',
+                    '2 cloves garlic',
+                    '1 cup mixed vegetables (e.g., peas, carrots)',
+                    '2 tbsp vegetable oil',
+                    'Salt to taste',
+                    'Soy sauce to taste'
+                ],
+                instructions: [
+                    'Scramble eggs in a pan and set aside.',
+                    'Heat oil in a wok or large skillet.',
+                    'Add onions and garlic, then stir-fry until they are translucent.',
+                    'Add mixed vegetables and cooked rice. Stir-fry everything together.',
+                    'Return scrambled eggs to the pan and mix well.'
+                ]
+            },
+            wagyuSteak: {
+                title: 'A5 Wagyu Steak',
+                description: 'A luxurious Japanese steak known for its marbling and rich flavor, typically grilled or pan-seared.',
+                ingredients: [
+                    '1 A5 Wagyu steak (about 1.5 lbs)',
+                    'Salt to taste',
+                    'Pepper to taste',
+                    '2 tbsp olive oil'
+                ],
+                instructions: [
+                    'Bring the steak to room temperature.',
+                    'Season with salt and pepper.',
+                    'Heat olive oil in a skillet over high heat.',
+                    'Sear the steak for 2-3 minutes per side, or until it reaches your desired level of doneness.'
+                ]
+            },
+            beefWellington: {
+                title: 'Beef Wellington',
+                description: 'A show-stopping dish featuring filet mignon coated in a layer of duxelles and wrapped in puff pastry.',
+                ingredients: [
+                    '1 (1.5 to 2 pound) filet mignon',
+                    '1/2 cup mushroom duxelles',
+                    '1/4 cup all-purpose flour',
+                    '1 tsp salt',
+                    '1/2 tsp black pepper',
+                    '1/2 cup puff pastry, thawed',
+                    '1 egg, beaten (for brushing pastry)'
+                ],
+                instructions: [
+                    'Season the filet mignon with salt and pepper.',
+                    'Sear the filet in a hot skillet until browned on all sides.',
+                    'Let the filet cool, then spread duxelles over it.',
+                    'Wrap the filet in puff pastry and brush with beaten egg.',
+                    'Bake in a preheated oven at 400°F for about 25-30 minutes.'
+                ]
+            },
+            newYorkPizza: {
+                title: 'New York Style Pizza',
+                description: 'A classic American pizza known for its thin crust and foldable slices.',
+                ingredients: [
+                    '2 cups warm water',
+                    '2 tsp sugar',
+                    '1 tsp active dry yeast',
+                    '3 cups all-purpose flour',
+                    '1 tsp salt',
+                    '2 tbsp olive oil',
+                    '1 cup pizza sauce',
+                    '1 cup shredded mozzarella cheese',
+                    'Toppings of your choice'
+                ],
+                instructions: [
+                    'Make the dough by combining warm water, sugar, and yeast. Let it rise.',
+                    'Knead the dough and shape into a circle or rectangle.',
+                    'Top with pizza sauce, mozzarella cheese, and your desired toppings.',
+                    'Bake in a preheated oven at 550°F for about 12-15 minutes.'
+                ]
+            }
+        };
+
+        let postedComments = [];
+
+        function openRecipePopup(name, chef, rating, imageSrc, recipeKey) {
+            document.getElementById('popupImage').src = imageSrc;
+            document.getElementById('popupChef').innerText = 'Chef: ' + chef;
+            document.getElementById('popupRating').innerText = 'Rating: ' + rating;
+            document.getElementById('popupTitle').innerText = recipes[recipeKey].title;
+            document.getElementById('popupDescription').innerText = recipes[recipeKey].description;
+
+            const ingredientsList = document.getElementById('popupIngredients');
+            ingredientsList.innerHTML = '';
+            recipes[recipeKey].ingredients.forEach(ingredient => {
+                const li = document.createElement('li');
+                li.innerText = ingredient;
+                ingredientsList.appendChild(li);
+            });
+
+            const instructionsList = document.getElementById('popupInstructions');
+            instructionsList.innerHTML = '';
+            recipes[recipeKey].instructions.forEach(instruction => {
+                const li = document.createElement('li');
+                li.innerText = instruction;
+                instructionsList.appendChild(li);
+            });
+
+            document.getElementById('recipePopup').style.display = 'block';
+            displayComments();
+        }
+
+        function closeRecipePopup() {
+            document.getElementById('recipePopup').style.display = 'none';
+        }
+
+        function toggleCommentForm() {
+            const commentForm = document.getElementById('commentForm');
+            commentForm.style.display = commentForm.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function postComment() {
+            const commentInput = document.getElementById('commentInput');
+            const commentText = commentInput.value.trim();
+            if (commentText) {
+                postedComments.push(commentText);
+                commentInput.value = '';
+                displayComments();
+            }
+        }
+
+        function displayComments() {
+            const commentsDiv = document.getElementById('postedComments');
+            commentsDiv.innerHTML = '';
+            postedComments.forEach(comment => {
+                const p = document.createElement('p');
+                p.innerText = comment;
+                commentsDiv.appendChild(p);
+            });
+        }
+    </script>
+
+</body>
+
+</html>
