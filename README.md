@@ -16,3 +16,25 @@ A responsive and interactive web application for browsing, sharing, and explorin
 2. CSS & BOOTSTRAP - Applied for styling and responsiveness, including hover effects, grid layout, pop-up design, and smooth transitions.
 3. JAVASCRIPT - Handles dynamic interactions, such as opening and closing the pop-up, displaying recipe details, and managing the share and comment buttons.
 
+#Implementation
+
+HTML (Structure)
+
+Defined the navbar, search bar, and recipe grid layout.
+Added individual recipe cards with images, chef details, and ratings.
+Included a pop-up modal that appears when clicking on a recipe card.
+
+CSS & Bootstrap (Styling)
+
+Used dark-themed colors with contrasting text and button colors.
+Applied grid layout for recipes and flexbox for pop-up details.
+Added hover effects and smooth transitions for better UX.
+Styled buttons for sharing and commenting.
+
+JavaScript (Functionality)
+
+Included event listeners to open/close the pop-up when clicking a recipe card.
+Dynamically updated recipe details in the pop-up.
+Added logic for share and comment button interactions.
+Ensured pop-up closes when clicking the close button.
+Managed responsive behavior and smooth display changes.
